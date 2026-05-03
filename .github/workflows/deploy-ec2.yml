@@ -145,7 +145,7 @@ jobs:
             echo "Docker not found. Installing Docker..."
             if command -v apt-get >/dev/null 2>&1; then
               sudo apt-get update
-              sudo apt-get install -y docker.io docker-compose-plugin
+              sudo apt-get install -y docker.io
             else
               echo "ERROR: Unsupported package manager; install Docker manually."
               exit 1
@@ -153,6 +153,31 @@ jobs:
           fi
 
           sudo systemctl enable --now docker || true
+
+          if ! sudo docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+            echo "Docker Compose not found. Installing Docker Compose..."
+            if command -v apt-get >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y docker-compose-plugin || sudo apt-get install -y docker-compose || true
+            fi
+
+            if ! sudo docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+              ARCH="$(uname -m)"
+              case "$ARCH" in
+                x86_64) COMPOSE_ARCH="x86_64" ;;
+                aarch64|arm64) COMPOSE_ARCH="aarch64" ;;
+                *)
+                  echo "ERROR: Unsupported architecture for Docker Compose fallback: $ARCH"
+                  exit 1
+                  ;;
+              esac
+
+              sudo curl -fsSL \
+                "https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-${COMPOSE_ARCH}" \
+                -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+          fi
 
           if sudo docker compose version >/dev/null 2>&1; then
             DOCKER_COMPOSE_CMD="sudo docker compose"
