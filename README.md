@@ -14,7 +14,15 @@ An AI-powered insurance claims copilot for support agents and claim adjusters. T
 - Docker Compose setup for API and dashboard services
 - GitHub Actions workflows for CI and EC2 deployment
 
+
+## 🏗️ Architecture
+
+![Architecture](Architecture.png)
+
+
 ```
+
+
 
 
 ## Project Structure
