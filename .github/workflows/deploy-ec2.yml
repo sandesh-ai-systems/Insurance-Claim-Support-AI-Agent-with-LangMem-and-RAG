@@ -40,10 +40,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Inject .env from secret (optional)
-        if: ${{ vars.INJECT_ENV_FILE == 'true' }}
+      - name: Inject .env from secret when provided
+        env:
+          EC2_ENV_FILE: ${{ secrets.EC2_ENV_FILE }}
         run: |
-          printf "%s" "${{ secrets.EC2_ENV_FILE }}" > .env
+          if [ -n "$EC2_ENV_FILE" ]; then
+            printf "%s" "$EC2_ENV_FILE" > .env
+            echo ".env injected from EC2_ENV_FILE secret"
+          else
+            echo "EC2_ENV_FILE secret not set; expecting .env to already exist on EC2"
+          fi
 
       - name: Configure SSH key
         run: |
