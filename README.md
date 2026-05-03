@@ -22,9 +22,6 @@ An AI-powered insurance claims copilot for support agents and claim adjusters. T
 
 ```
 
-
-
-
 ## Project Structure
 
 ```text
